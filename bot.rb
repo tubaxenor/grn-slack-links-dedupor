@@ -4,7 +4,7 @@ require "httparty"
 require "json"
 
 Slack.configure do |config|
-  config.token = "xoxb-23730056647-auhmwtQU6tEcjbdv9LASaP7X"
+  config.token = ENV["SLACK_API_TOKEN"]
 end
 
 client = Slack::RealTime::Client.new
@@ -18,7 +18,7 @@ github_search_api_base = "https://api.github.com/search/code"
 
 client.on :message do |data|
   if data.channel == channel_id
-    if (urls = URI.extract(data.text)).any?
+    if (urls = URI.extract(data.text, ["http", "https"])).any?
       urls.each do |url|
         res = HTTParty.get(github_search_api_base,
           query: { q: url + "+repo:greenruby/grn-static"}
